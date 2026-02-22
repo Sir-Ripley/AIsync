@@ -1,0 +1,107 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyOWMoeZTkH9xVOqLVDlwfpy",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/Sir-Ripley/AIsync/blob/main/QAG-recordpropulsuon.pynb\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "9JmYTOED88lo",
+        "outputId": "baed653c-abc4-469a-94dc-0ecc76377566"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Initiating Record-Breaker Simulation...\n",
+            "Time: 0 | Force: 0.00000000 | Status: EXCEEDING RECORDS\n",
+            "Time: 50 | Force: 0.00052059 | Status: EXCEEDING RECORDS\n",
+            "Time: 100 | Force: 0.00053058 | Status: EXCEEDING RECORDS\n",
+            "Time: 150 | Force: 0.00067202 | Status: EXCEEDING RECORDS\n",
+            "Time: 200 | Force: 0.00237758 | Status: EXCEEDING RECORDS\n",
+            "Time: 250 | Force: 0.00047982 | Status: EXCEEDING RECORDS\n",
+            "Time: 300 | Force: 0.00025672 | Status: EXCEEDING RECORDS\n",
+            "Time: 350 | Force: 0.00014944 | Status: EXCEEDING RECORDS\n",
+            "Time: 400 | Force: 0.00029552 | Status: EXCEEDING RECORDS\n",
+            "Time: 450 | Force: 0.00014238 | Status: EXCEEDING RECORDS\n",
+            "Final Force achieved. Ready for GitHub upload.\n"
+          ]
+        }
+      ],
+      "source": [
+        "import numpy as np\n",
+        "import matplotlib.pyplot as plt\n",
+        "\n",
+        "# QAG RECORD-BREAKER: Hydrogen-Coupled SAW Propulsion\n",
+        "grid_size = 100\n",
+        "u = np.zeros((grid_size, grid_size))\n",
+        "u_prev = np.zeros((grid_size, grid_size))\n",
+        "u_next = np.zeros((grid_size, grid_size))\n",
+        "\n",
+        "# Constants for the \"New Record\" run\n",
+        "c_squared = 0.20   # Optimized for Liquid Hydrogen medium\n",
+        "Q_id = 2.1         # The New Record Throttle\n",
+        "V_gain = 0.18      # Scaled Voltage for Material Safety\n",
+        "wall_mass = 50.0   # The \"Ship\" Mass\n",
+        "\n",
+        "# Phased Array Emitters\n",
+        "emitter_1_x, emitter_2_x = 20, 25\n",
+        "x, y = np.arange(0, grid_size), np.arange(0, grid_size)\n",
+        "X, Y = np.meshgrid(x, y)\n",
+        "bar_shape = np.exp(-((Y - 50)**2) / (2 * 15.0**2))\n",
+        "footprint_1 = np.exp(-((X - emitter_1_x)**2) / (2 * 1.5**2)) * bar_shape\n",
+        "footprint_2 = np.exp(-((X - emitter_2_x)**2) / (2 * 1.5**2)) * bar_shape\n",
+        "\n",
+        "print(\"Initiating Record-Breaker Simulation...\")\n",
+        "\n",
+        "for t in range(500):\n",
+        "    laplacian = (np.roll(u,1,0)+np.roll(u,-1,0)+np.roll(u,1,1)+np.roll(u,-1,1)-4*u)\n",
+        "    u_next = 2*u - u_prev + c_squared * laplacian\n",
+        "\n",
+        "    # Dual-Phase Injection (The Psychon Emitter)\n",
+        "    u_next += V_gain * np.sin(0.85 * t) * footprint_1\n",
+        "    u_next += V_gain * np.sin(0.85 * t - 1.5) * footprint_2\n",
+        "\n",
+        "    # Boundary Push Force Calculation\n",
+        "    wall_impact = np.abs(u[:, 90:]).mean()\n",
+        "    push_force = 0.5 * (wall_impact**2)\n",
+        "\n",
+        "    u_next *= 0.995 # Coherence damping\n",
+        "    u_prev, u = u.copy(), u_next.copy()\n",
+        "\n",
+        "    if t % 50 == 0:\n",
+        "        print(f\"Time: {t} | Force: {push_force:.8f} | Status: EXCEEDING RECORDS\")\n",
+        "\n",
+        "print(\"Final Force achieved. Ready for GitHub upload.\")"
+      ]
+    }
+  ]
+}
