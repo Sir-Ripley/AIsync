@@ -664,6 +664,47 @@
           "metadata": {}
         }
       ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "unittest-hydrogen-coupled-saw"
+      },
+      "source": [
+        "import numpy as np\n",
+        "\n",
+        "def test_hydrogen_coupled_saw_propulsion():\n",
+        "    print(\"Running UNIT TESTS for hydrogen_coupled_saw_propulsion...\")\n",
+        "    \n",
+        "    # Test scalar input (or single element array)\n",
+        "    t_single = np.array([0.0])\n",
+        "    res_single = hydrogen_coupled_saw_propulsion(t_single)\n",
+        "    # sin(0) is 0, so result should be 0\n",
+        "    assert np.isclose(res_single[0], 0.0), f\"Expected 0.0 at t=0, got {res_single[0]}\"\n",
+        "    \n",
+        "    # Test array input\n",
+        "    t_arr = np.linspace(0, 10, 100)\n",
+        "    res_arr = hydrogen_coupled_saw_propulsion(t_arr)\n",
+        "    assert len(res_arr) == 100, \"Result array length mismatch\"\n",
+        "    \n",
+        "    # Test known value calculation\n",
+        "    # psychon_mass_ug = 5400\n",
+        "    # golden_freq_mhz = 0.70\n",
+        "    # omega = 2 * np.pi * 0.70\n",
+        "    # t = 1.0\n",
+        "    # expected = 5400 * np.sin(omega * 1.0) * np.exp(0.05 * 1.0)\n",
+        "    t_val = np.array([1.0])\n",
+        "    res_val = hydrogen_coupled_saw_propulsion(t_val)\n",
+        "    expected_val = 5400 * np.sin(2 * np.pi * 0.70 * 1.0) * np.exp(0.05 * 1.0)\n",
+        "    assert np.isclose(res_val[0], expected_val), f\"Value mismatch at t=1.0: {res_val[0]} != {expected_val}\"\n",
+        "    \n",
+        "    print(\"ALL UNIT TESTS PASSED!\")\n",
+        "\n",
+        "if __name__ == \"__main__\":\n",
+        "    test_hydrogen_coupled_saw_propulsion()"
+      ],
+      "execution_count": null,
+      "outputs": []
     }
   ]
 }
